@@ -1,20 +1,41 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { map } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { map, Observable, Subscription } from 'rxjs';
+import * as authActions from '../auth/auth.actions';
 import { Usuario } from '../models/usuario.model';
+
+interface userResponse {
+  uid:string;
+  email:string;
+  nombre:string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  fireUser = new Subscription;
 
-  constructor(private auth: AngularFireAuth, private firestore: AngularFirestore) { }
+  constructor(private auth: AngularFireAuth, private firestore: AngularFirestore, private store: Store) { }
 
   initAuthListener() {
     this.auth.authState.subscribe((fuser: any) => {
-      console.log(fuser);
-      console.log(fuser?.uid);
-      console.log(fuser?.email);
+      if (fuser !== null) {
+        this.fireUser = this.firestore.doc<userResponse>(`${fuser.uid}/usuario`)
+          .valueChanges().subscribe(firestoreUser => {
+            if(firestoreUser ){
+              this.store.dispatch(
+                authActions.setUser({ user: { email: firestoreUser.email, nombre: firestoreUser.nombre, uid: firestoreUser.uid } })
+              )
+            }
+          })
+      } else {
+        this.fireUser.unsubscribe();
+        this.store.dispatch(authActions.unSetUser())
+
+      }
 
     })
   }
@@ -31,6 +52,7 @@ export class AuthService {
     return this.auth.signInWithEmailAndPassword(email, password);
   }
   logout() {
+    this.store.dispatch(authActions.unSetUser())
     return this.auth.signOut();
   }
   isAuth() {
