@@ -4,6 +4,7 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { Store } from '@ngrx/store';
 import { map, Observable, Subscription } from 'rxjs';
 import * as authActions from '../auth/auth.actions';
+import { unSetItems } from '../ingreso-egreso/ingreso-egreso.actions';
 import { Usuario } from '../models/usuario.model';
 
 interface userResponse {
@@ -17,6 +18,8 @@ interface userResponse {
 })
 export class AuthService {
   fireUser = new Subscription;
+  private _user:Usuario ={email:'',nombre:'',uid:''};
+  
 
   constructor(private auth: AngularFireAuth, private firestore: AngularFirestore, private store: Store) { }
 
@@ -26,6 +29,7 @@ export class AuthService {
         this.fireUser = this.firestore.doc<userResponse>(`${fuser.uid}/usuario`)
           .valueChanges().subscribe(firestoreUser => {
             if(firestoreUser ){
+              this._user = firestoreUser;
               this.store.dispatch(
                 authActions.setUser({ user: { email: firestoreUser.email, nombre: firestoreUser.nombre, uid: firestoreUser.uid } })
               )
@@ -33,6 +37,7 @@ export class AuthService {
           })
       } else {
         this.fireUser.unsubscribe();
+        this._user = {email:'',nombre:'',uid:''};
         this.store.dispatch(authActions.unSetUser())
 
       }
@@ -53,12 +58,16 @@ export class AuthService {
   }
   logout() {
     this.store.dispatch(authActions.unSetUser())
+    this.store.dispatch( unSetItems() )
     return this.auth.signOut();
   }
   isAuth() {
     return this.auth.authState.pipe(
       map(fbUser => fbUser != null)
     )
+  }
+  getUser(){
+    return this._user;
   }
 
 }

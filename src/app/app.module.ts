@@ -23,7 +23,9 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { OrdenIngresoPipe } from './pipes/orden-ingreso.pipe';
 
+import { NgChartsModule } from 'ng2-charts';
 
 @NgModule({
   declarations: [
@@ -36,7 +38,8 @@ import { AngularFireAuthModule } from '@angular/fire/compat/auth';
     DetalleComponent,
     FooterComponent,
     NavbarComponent,
-    SidebarComponent
+    SidebarComponent,
+    OrdenIngresoPipe
   ],
   imports: [
     BrowserModule,
@@ -45,6 +48,7 @@ import { AngularFireAuthModule } from '@angular/fire/compat/auth';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     AngularFireAuthModule,
+    NgChartsModule,
     StoreModule.forRoot(appReducers),
     StoreDevtoolsModule.instrument({
       maxAge: 25, // Retains last 25 states
