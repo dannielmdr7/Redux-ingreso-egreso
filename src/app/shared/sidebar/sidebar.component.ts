@@ -29,8 +29,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   logout() {
     this.authService.logout().then(user => {
-      console.log({ user });
-
       this.router.navigate(['/login']);
     })
 

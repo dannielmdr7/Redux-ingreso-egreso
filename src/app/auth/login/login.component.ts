@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router, private store: Store<AppState>) {
     this.uiSubscription = this.store.select('ui').subscribe(ui => {
-      console.log('subs');
+
 
       this.cargando = ui.isLoading
     });
@@ -53,11 +53,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     })
       .catch(err => {
         uiActions.stopLoading();
-        // Swal.fire({
-        //   icon: 'error',
-        //   title: 'Oops...',
-        //   text: err.message
-        // })
       });
 
   }
